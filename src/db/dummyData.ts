@@ -1,8 +1,7 @@
 export interface Message {
   id: number;
   senderId: string;
-  content: string;
-  messageType: "text" | "image";
+  message: string;
 }
 
 export interface User {
@@ -41,63 +40,23 @@ export const USERS = [
 
 export const messages = [
   {
-    id: 1,
+    id: 7,
     senderId: USERS[0].id,
-    content: "Hello",
-    messageType: "text",
+    message: "Cool",
   },
   {
-    id: 2,
+    id: 8,
     senderId: USERS[1].id,
-    content: "Hi",
-    messageType: "text",
+    message: "Yeah",
   },
   {
-    id: 3,
+    id: 9,
     senderId: USERS[0].id,
-    content: "How are you?",
-    messageType: "text",
+    message: "Bye",
   },
   {
-    id: 4,
+    id: 10,
     senderId: USERS[1].id,
-    content: "I'm good",
-    messageType: "text",
+    message: "Bye",
   },
-  {
-    id: 5,
-    senderId: USERS[0].id,
-    content: "What are you doing?",
-    messageType: "text",
-  },
-    {
-      id: 6,
-      senderId: USERS[1].id,
-      content: "Nothing much",
-      messageType: "text",
-    },
-    {
-      id: 7,
-      senderId: USERS[0].id,
-      content: "Cool",
-      messageType: "text",
-    },
-    {
-      id: 8,
-      senderId: USERS[1].id,
-      content: "Yeah",
-      messageType: "text",
-    },
-    {
-      id: 9,
-      senderId: USERS[0].id,
-      content: "Bye",
-      messageType: "text",
-    },
-    {
-      id: 10,
-      senderId: USERS[1].id,
-      content: "Bye",
-      messageType: "text",
-    },
 ];

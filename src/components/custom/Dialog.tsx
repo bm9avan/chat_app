@@ -1,4 +1,4 @@
-import React, { type PropsWithChildren } from "react";
+import React, { type ReactNode, type PropsWithChildren } from "react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -7,15 +7,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "../ui/button";
 
-type Props = PropsWithChildren<{ trigger: string }>;
+type Props = PropsWithChildren<{ trigger: ReactNode }>;
 
 const Dialog = ({ trigger, children }: Props) => {
   return (
     <AlertDialog>
-      <AlertDialogTrigger>
-        <Button onClick={() => console.log("object")}>{trigger}</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogTrigger>{trigger}</AlertDialogTrigger>
+      <AlertDialogContent className="border-0">
         <AlertDialogHeader>{children}</AlertDialogHeader>
       </AlertDialogContent>
     </AlertDialog>

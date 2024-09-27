@@ -25,7 +25,7 @@ export default function LandingPage() {
                 className="space-y-4 text-center md:text-left"
               >
                 <h1 className="text-3xl font-bold tracking-tighter text-center sm:text-4xl md:text-5xl lg:text-6xl/none text-gray-900 dark:text-white">
-                  Connect with your Friends
+                  Connect with your Friends at your Fingertips
                 </h1>
                 <p className="max-w-[600px] text-gray-500 m-auto text-center md:text-xl dark:text-gray-400">
                   Experience seamless communication with our intuitive chat

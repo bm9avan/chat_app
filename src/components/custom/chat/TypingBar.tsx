@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Image as ImageIcon,
   Loader,
+  Loader2,
   SendHorizontal,
   ThumbsUp,
 } from "lucide-react";
@@ -27,9 +28,14 @@ import { Message, USERS } from "@/db/dummyData";
 import { Button } from "@/components/ui/button";
 import { UseSound as UseSoundHook } from "@/store/useSound";
 import EmojiPicker from "./EmojiPicker";
+import { useParams } from "next/navigation";
+import toast from "react-hot-toast";
 
 const TypingBar = () => {
+  const { friend_id } = useParams();
+  console.log("typeinggg", friend_id);
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   // const { USERS[1] } = useSelectedUser();
   // const { user: USERS[0] } = useKindeBrowserClient();
@@ -57,10 +63,43 @@ const TypingBar = () => {
   // mutationFn: sendMessageAction,
   // });
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
 
-    // sendMessage({ content: message, messageType: "text", receiverId: USERS[1]?.id! });
+  const handleSendMessage = async () => {
+    if (!message.trim()) return;
+    if (typeof friend_id !== "string" || !friend_id) {
+      toast.error("Friend ID is required");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/sendMessage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message, friendId: friend_id }),
+      });
+      // sendMessage({ content: message, messageType: "text", receiverId: USERS[1]?.id! });
+      console.log("bro ", res);
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data);
+      } else {
+        toast.success(data);
+        // setRequests((prev) =>
+        //   prev.filter((request) => request.id !== friendId)
+        // );
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("An error occurred while accepting the request.");
+    } finally {
+      setIsLoading(false);
+    }
     setMessage("");
 
     textAreaRef.current?.focus();
@@ -140,14 +179,14 @@ const TypingBar = () => {
           <DialogFooter>
             <Button
               type="submit"
-              //   onClick={() => {
-              //     sendMessage({
-              //       content: imgUrl,
-              //       messageType: "image",
-              //       receiverId: USERS[1]?.id!,
-              //     });
-              //     setImgUrl("");
-              //   }}
+              // onClick={() => {
+              //   sendMessage({
+              //     message: imgUrl,
+              //     messageType: "image",
+              //     receiverId: USERS[1]?.id!,
+              //   });
+              //   setImgUrl("");
+              // }}
             >
               Send
             </Button>
@@ -158,6 +197,7 @@ const TypingBar = () => {
       <AnimatePresence>
         <motion.div
           layout
+          key="unique-key"
           initial={{ opacity: 0, scale: 1 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 1 }}
@@ -202,8 +242,13 @@ const TypingBar = () => {
             variant={"ghost"}
             size={"icon"}
             onClick={handleSendMessage}
+            disabled={isLoading}
           >
-            <SendHorizontal size={20} className="text-muted-foreground" />
+            {isLoading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <SendHorizontal size={20} className="text-muted-foreground" />
+            )}
           </Button>
         ) : (
           <Button

@@ -6,13 +6,21 @@ import {
 } from "@/components/ui/resizable";
 import { FC, ReactNode, useEffect, useState } from "react";
 import SideBar from "./SideBar";
+import { User } from "next-auth";
 
 interface pageProps {
   position: number[] | undefined;
   children: ReactNode;
+  me: User;
+  friends: User[];
 }
 
-const ChatLayout: FC<pageProps> = ({ position = [25, 75], children }) => {
+const ChatLayout: FC<pageProps> = ({
+  position = [25, 75],
+  children,
+  me,
+  friends,
+}) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -44,7 +52,7 @@ const ChatLayout: FC<pageProps> = ({ position = [25, 75], children }) => {
         }}
         onExpand={() => setIsCollapsed(false)}
       >
-        <SideBar isCollapsed={isCollapsed} />
+        <SideBar isCollapsed={isCollapsed} friends={friends} />
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={position[1]}>{children}</ResizablePanel>

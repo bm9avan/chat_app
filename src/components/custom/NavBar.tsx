@@ -2,17 +2,34 @@
 import Dialog from "@/components/custom/Dialog";
 import { Button } from "@/components/ui/button";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
-import { MessageCircle, Moon, Sun, Volume2, VolumeX } from "lucide-react";
+import {
+  Loader2,
+  MessageCircle,
+  Moon,
+  Sun,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { type ReactNode, useEffect, useState } from "react";
 import { Account } from "./Account";
 import useSound from "use-sound";
 import { UseSound as UseSoundHook } from "@/store/useSound";
+import { useSession } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Session, User } from "next-auth";
 
-export default function NavBar({ children }: { children: ReactNode }) {
+export default function NavBar({
+  children,
+  currentUser: session,
+}: {
+  children: ReactNode;
+  currentUser: Session | null;
+}) {
   const { theme, setTheme } = useTheme();
-  // const [sound, setSound] = useState(false);
+  // const [sound, setSound] = useState(false                                 );
+  // const { status, data: session } = useSession();
   const { sound, setSound } = UseSoundHook();
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -21,7 +38,10 @@ export default function NavBar({ children }: { children: ReactNode }) {
   const [offSound] = useSound("/sounds/sound-off.mp3");
   const { scrollY } = useScroll();
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    setTheme("dark");
+  }, []);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 0);
@@ -42,10 +62,8 @@ export default function NavBar({ children }: { children: ReactNode }) {
         }`}
       >
         <Link className="flex items-center justify-center" href="/">
-          <MessageCircle className="h-6 w-6 mr-2 text-primary" />
-          <span className="font-bold text-gray-900 dark:text-white">
-            ChatApp
-          </span>
+          <MessageCircle className="h-6 w-6 mr-2 text-primary text-[#ff6a6a]" />
+          <span className="font-bold text-[#ff6a6a]">ChatApp</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Button variant="ghost" size="icon" onClick={() => setSound(!sound)}>
@@ -71,18 +89,73 @@ export default function NavBar({ children }: { children: ReactNode }) {
             }}
           >
             {theme === "dark" ? (
-              <Sun className="h-5 w-5 dark:text-white" />
+              <Sun className="h-5 w-5 text-gray-900 dark:text-white" />
             ) : (
-              <Moon className="h-5 w-5 text-gray-900" />
+              <Moon className="h-5 w-5 text-gray-900 dark:text-white" />
             )}
             <span className="sr-only">Toggle theme</span>
           </Button>
           {/* <Button asChild> */}
           {/* <Link href="/login">Login</Link> */}
-          <Dialog trigger={false ? "LogOut" : "LogIn"}>
-            <Account />
-          </Dialog>
-          {/* </Button> */}
+          {session !== null ? (
+            <Dialog
+              trigger={
+                <Avatar className="w-8 h-8 bg-transparent">
+                  <AvatarImage
+                    referrerPolicy="no-referrer"
+                    src={session.user.image || "/user-placeholder.png"}
+                    alt={
+                      session.user.name === null ? "Name" : session.user.name
+                    }
+                  />
+                  <AvatarFallback>
+                    {(typeof session.user.name !== "string"
+                      ? "Name"
+                      : session.user.name
+                    )
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              }
+            >
+              <Account />
+            </Dialog>
+          ) : (
+            <Dialog trigger={<Button>Login</Button>}>
+              <Account />
+            </Dialog>
+          )}
+          {/* {status === "loading" ? (
+            <Loader2 className="animate-spin" />
+          ) : status === "authenticated" ? (
+            <Dialog
+              trigger={
+                <Avatar className="w-8 h-8 bg-transparent">
+                  <AvatarImage referrerPolicy="no-referrer"
+                    src={session.user.image || "/user-placeholder.png"}
+                    alt={
+                      session.user.name === null ? "Name" : session.user.name
+                    }
+                  />
+                  <AvatarFallback>
+                    {(typeof session.user.name !== "string"
+                      ? "Name"
+                      : session.user.name
+                    )
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              }
+            >
+              <Account />
+            </Dialog>
+          ) : (
+            <Dialog trigger={<Button>Login</Button>}>
+              <Account />
+            </Dialog>
+          )} */}
         </nav>
       </motion.header>
       <div className="pt-14">{children}</div>
