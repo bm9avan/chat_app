@@ -7,10 +7,12 @@ export async function fetchHelperForRedis(
 ) {
   try {
     const res = await fetch(
-      `${process.env.UPSTASH_REDIS_REST_URL}/${commnad}/${args.join("/")}`,
+      `${process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL}/${commnad}/${args.join(
+        "/"
+      )}`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN}`,
         },
         cache: "no-cache",
       }
@@ -23,8 +25,8 @@ export async function fetchHelperForRedis(
     //   "env",
     //   res,
     //   process.env,
-    //   process.env.UPSTASH_REDIS_REST_URL,
-    //   `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`
+    //   process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL,
+    //   `Bearer ${process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN}`
     // );
     const data = await res.json();
     return data.result;

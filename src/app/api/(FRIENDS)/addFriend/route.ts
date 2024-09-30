@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { pusherNameHelper, pusherServer } from "@/lib/pusher";
 import { fetchHelperForRedis } from "@/lib/redis";
 import { getServerSession } from "next-auth";
 
@@ -79,7 +80,13 @@ async function AddFriend(req: Request) {
 
     await db.sadd(`user:${friendId}:incoming_friend_requests`, currentUserId);
     console.log("Friend request sent successfully");
-
+    pusherServer.trigger(
+      pusherNameHelper(`user:${friendId}:incoming_friend_requests`),
+      "incoming_friend_requests",
+      {
+        newRequest: currentUser.user,
+      }
+    );
     return Response.json("Friend request sent successfully", { status: 201 });
   } catch (error) {
     return Response.json("Error: Invalid Request", { status: 500 });

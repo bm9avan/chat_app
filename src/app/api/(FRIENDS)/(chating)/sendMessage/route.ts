@@ -2,6 +2,7 @@ import { messages } from "@/db/dummyData";
 import { authOptions } from "@/lib/auth";
 import chatUniqueId from "@/lib/chatUniqueId";
 import { db } from "@/lib/db";
+import { pusherNameHelper, pusherServer } from "@/lib/pusher";
 import { fetchHelperForRedis } from "@/lib/redis";
 import { getServerSession } from "next-auth";
 
@@ -45,13 +46,31 @@ async function SendMessage(req: Request) {
     const friendDetails = (await db.get(`user:${friendId}`)) as User;
     console.log("friends details await", friendDetails);
     const timestamp = Date.now();
-    const unParsedmessages = await db.zadd(
-      `chat:${chatUniqueId(currentUserId, friendId)}`,
+    await db.zadd(`chat:${chatUniqueId(currentUserId, friendId)}`, {
+      score: timestamp,
+      member: JSON.stringify({ senderId: currentUserId, message, timestamp }),
+    });
+
+    console.log("unParsedmessages id", chatUniqueId(currentUserId, friendId));
+    const chatId = chatUniqueId(currentUserId, friendId);
+    pusherServer.trigger(
+      pusherNameHelper(`chat:${chatId}`),
+      "incoming_friend_message",
+      { senderId: currentUserId, message, timestamp }
+    );
+    pusherServer.trigger(
+      pusherNameHelper(`chat:${friendId}:friend`),
+      "new_message",
       {
-        score: timestamp,
-        member: JSON.stringify({ senderId: currentUserId, message, timestamp }),
+        senderId: currentUserId,
+        senderName: currentUser.user.name,
+        message,
+        timestamp,
+        chatId,
+        senderImg: currentUser.user.image,
       }
     );
+
     return Response.json("Message added to DB sucessfuly", {
       status: 200,
     });

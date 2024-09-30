@@ -13,10 +13,7 @@ export default async function RootLayout({
   params: { friends: User[] };
 }) {
   const session = await getServerSession(authOptions);
-  const currentUserId = session
-    ? session.user.id ||
-      (await fetchHelperForRedis("get", `user:email:${session.user.email}`))
-    : null;
+  const currentUserId = session ? session.user.id : null;
   const friends = await fetchHelperForRedis(
     "smembers",
     `user:${currentUserId}:friends`

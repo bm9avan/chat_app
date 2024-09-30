@@ -1,3 +1,4 @@
+"use client";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Image as ImageIcon,
@@ -89,7 +90,7 @@ const TypingBar = () => {
       if (!res.ok) {
         toast.error(data);
       } else {
-        toast.success(data);
+        // toast.success(data);
         // setRequests((prev) =>
         //   prev.filter((request) => request.id !== friendId)
         // );

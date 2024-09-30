@@ -1,7 +1,8 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { pusherNameHelper, pusherServer } from "@/lib/pusher";
 import { fetchHelperForRedis } from "@/lib/redis";
-import { getServerSession } from "next-auth";
+import { getServerSession, User } from "next-auth";
 
 async function AcceptFriend(req: Request) {
   const { friendEmail, friendId } = await req.json();
@@ -14,12 +15,23 @@ async function AcceptFriend(req: Request) {
     });
   }
 
-  //   const friendId = await fetchHelperForRedis(
-  //     "get",
-  //     `user:email:${friendEmail}`
-  //   );
+  const unParsedfriendDetails = (await fetchHelperForRedis(
+    "get",
+    `user:${friendId}`
+  )) as string;
+  const friendDetails = JSON.parse(unParsedfriendDetails) as User;
   console.log("step2", friendId);
-
+  console.log(
+    "why are invalid is it  not getting the user details from redis",
+    friendDetails,
+    friendEmail,
+    friendId
+  );
+  if (friendDetails.email !== friendEmail) {
+    return Response.json("User Details", {
+      status: 404,
+    });
+  }
   //   if (!friendId) {
   //     return Response.json("User not found with corresponding email", {
   //       status: 404,
@@ -78,7 +90,13 @@ async function AcceptFriend(req: Request) {
   await db.sadd(`user:${currentUserId}:friends`, friendId);
   await db.srem(`user:${currentUserId}:incoming_friend_requests`, friendId);
   console.log("YOu bort are friends now");
-
+  pusherServer.trigger(
+    pusherNameHelper(`user:${friendId}:friend`),
+    "friendship_established",
+    {
+      friend: currentUser.user,
+    }
+  );
   return Response.json("Friendship established", { status: 201 });
 }
 export { AcceptFriend as POST };

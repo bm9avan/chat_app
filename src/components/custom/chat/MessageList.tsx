@@ -1,17 +1,21 @@
+"use client";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { useSelectedUser } from "@/store/useSelectedUser";
 // import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 // import { useQuery } from "@tanstack/react-query";
 // import { getMessages } from "@/actions/message.actions";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { messages, USERS } from "@/db/dummyData";
 import { User } from "next-auth";
+import { fetchHelperForRedis } from "@/lib/redis";
+import { pusherClient, pusherNameHelper } from "@/lib/pusher";
+import chatUniqueId from "@/lib/chatUniqueId";
 // import MessageSkeleton from "../skeletons/MessageSkeleton";
 
 const MessageList = ({
-  messages,
+  messages: dbMessages,
   me,
   friend,
 }: {
@@ -19,28 +23,29 @@ const MessageList = ({
   me: User;
   friend: User;
 }) => {
-  //   const { selectedUser } = useSelectedUser();
-  //   const { user: currentUser, isLoading: isUserLoading } =
-  //     useKindeBrowserClient();
+  const [messages, setMessages] = useState(dbMessages);
   const messageContainerRef = useRef<HTMLDivElement>(null);
 
-  //   const { data: messages, isLoading: isMessagesLoading } = useQuery({
-  //     queryKey: ["messages", selectedUser?.id],
-  //     queryFn: async () => {
-  //       if (selectedUser && currentUser) {
-  //         return await getMessages(selectedUser?.id, currentUser?.id);
-  //       }
-  //     },
-  //     enabled: !!selectedUser && !!currentUser && !isUserLoading,
-  //   });
-
-  // Scroll to the bottom of the message container when new messages are added
-  //   useEffect(() => {
-  //     if (messageContainerRef.current) {
-  //       messageContainerRef.current.scrollTop =
-  //         messageContainerRef.current.scrollHeight;
-  //     }
-  //   }, [messages]);
+  useEffect(() => {
+    pusherClient.subscribe(
+      pusherNameHelper(`chat:${chatUniqueId(me.id, friend.id)}`)
+    );
+    function realTimeHandler(message: Message) {
+      console.log("real time message", message, chatUniqueId(me.id, friend.id));
+      setMessages((pr) => {
+        // if (pr === undefined || pr == null) return [newRequest];
+        return [message, ...pr];
+      });
+    }
+    pusherClient.bind("incoming_friend_message", realTimeHandler);
+    return () => {
+      console.log("sorry we its time to unbind");
+      pusherClient.unbind("incoming_friend_message", realTimeHandler);
+      pusherClient.unsubscribe(
+        pusherNameHelper(`chat:${chatUniqueId(me.id, friend.id)}`)
+      );
+    };
+  }, []);
 
   return (
     <div
@@ -51,32 +56,25 @@ const MessageList = ({
       {/* <AnimatePresence> */}
       {messages &&
         messages?.map((message, i) => {
-          console.log(
-            i,
-            "message clit hi",
-            message.senderId === me.id,
-            message.senderId,
-            me.id
-          );
           return (
-            <div
+            <motion.div
               key={message.timestamp}
-              // layout
-              // initial={{ opacity: 0, scale: 1, y: 50, x: 0 }}
-              // animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
-              // exit={{ opacity: 0, scale: 1, y: 1, x: 0 }}
-              // transition={{
-              //   opacity: { duration: 0.1 },
-              //   layout: {
-              //     type: "spring",
-              //     bounce: 0.3,
-              //     duration: messages.indexOf(message) * 0.05 + 0.2,
-              //   },
-              // }}
-              // style={{
-              //   originX: 0.5,
-              //   originY: 0.5,
-              // }}
+              layout
+              initial={{ opacity: 0, scale: 1, y: 50, x: 0 }}
+              animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
+              exit={{ opacity: 0, scale: 1, y: 1, x: 0 }}
+              transition={{
+                opacity: { duration: 0.1 },
+                layout: {
+                  type: "spring",
+                  bounce: 0.3,
+                  duration: messages.indexOf(message) * 0.05 + 0.2,
+                },
+              }}
+              style={{
+                originX: 0.5,
+                originY: 0.5,
+              }}
               className={cn(
                 "flex flex-col gap-2 p-4 whitespace-pre-wrap",
                 message.senderId === me.id ? "items-end" : "items-start"
@@ -91,6 +89,11 @@ const MessageList = ({
                       alt="User Image"
                       className="border-2 border-white rounded-full"
                     />
+                    <AvatarFallback>
+                      {friend.name
+                        ? friend.name.slice(0, 2).toUpperCase()
+                        : "-_-"}
+                    </AvatarFallback>
                   </Avatar>
                 )}
                 {typeof message.message === "string" ? (
@@ -113,13 +116,22 @@ const MessageList = ({
                       alt="User Image"
                       className="border-2 border-white rounded-full"
                     />
+                    <AvatarFallback>
+                      {friend.name
+                        ? friend.name.slice(0, 2).toUpperCase()
+                        : "-_-"}
+                    </AvatarFallback>
                   </Avatar>
                 )}
               </div>
-            </div>
+            </motion.div>
           );
         })}
-
+      {messages.length === 0 && (
+        <p className="text-muted-foreground text-center">
+          You haven't chatted yet. Say hi and start talking!
+        </p>
+      )}
       {/* {isMessagesLoading && (
           <>
             <MessageSkeleton />

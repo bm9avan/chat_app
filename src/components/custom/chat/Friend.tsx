@@ -1,37 +1,52 @@
+"use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AddFriend from "./AddFriend";
-import AcceptRequest from "./AcceptRequest";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { pusherClient, pusherNameHelper } from "@/lib/pusher";
 import { fetchHelperForRedis } from "@/lib/redis";
+import { User } from "next-auth";
+import { useEffect, useState } from "react";
+import AcceptRequest from "./AcceptRequest";
+import AddFriend from "./AddFriend";
 
-const Friend = async () => {
-  const currentUser = await getServerSession(authOptions);
-  const currentUserId = currentUser
-    ? currentUser.user.id ||
-      (await fetchHelperForRedis("get", `user:email:${currentUser.user.email}`))
-    : null;
-  // const friends = await fetchHelperForRedis(
-  //   "smembers",
-  //   `user:${currentUserId}:friends`
-  // );
-  // const friendsWithDetails = await Promise.all(
-  //   friends.map(async (id: string) => {
-  //     const friendDetails = await fetchHelperForRedis("get", `user:${id}`);
-  //     return (await JSON.parse(friendDetails)) as User;
-  //   })
-  // );
-  const requests = await fetchHelperForRedis(
-    "smembers",
-    `user:${currentUserId}:incoming_friend_requests`
-  );
-  console.log("req", requests, requests.length);
-  const requestsWithDetails = await Promise.all(
-    requests.map(async (id: string) => {
-      const requestDetails = await fetchHelperForRedis("get", `user:${id}`);
-      return (await JSON.parse(requestDetails)) as User;
-    })
-  );
+const Friend = ({ me }: { me: User }) => {
+  const [requests, setRequests] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    async function fetchCurrentRequest() {
+      const requests = await fetchHelperForRedis(
+        "smembers",
+        `user:${me?.id}:incoming_friend_requests`
+      );
+      console.log("req", requests, requests.length);
+      const requestsWithDetails = await Promise.all(
+        requests.map(async (id: string) => {
+          const requestDetails = await fetchHelperForRedis("get", `user:${id}`);
+          return (await JSON.parse(requestDetails)) as User;
+        })
+      );
+      setRequests(requestsWithDetails);
+      setIsLoading(false);
+    }
+    fetchCurrentRequest();
+    pusherClient.subscribe(
+      pusherNameHelper(`user:${me?.id}:incoming_friend_requests`)
+    );
+    function realTimeHandler({ newRequest }: { newRequest: User }) {
+      setRequests((pr) => {
+        // if (pr === undefined || pr == null) return [newRequest];
+        console.log(newRequest);
+        return [...pr, newRequest];
+      });
+    }
+    pusherClient.bind("incoming_friend_requests", realTimeHandler);
+    return () => {
+      console.log("sorry we its time to unbind");
+      pusherClient.unbind("incoming_friend_requests", realTimeHandler);
+      pusherClient.unsubscribe(
+        pusherNameHelper(`user:${me?.id}:incoming_friend_requests`)
+      );
+    };
+  }, []);
+
   return (
     <Tabs defaultValue="send" className=" md:w-[400px]">
       <TabsList>
@@ -49,7 +64,11 @@ const Friend = async () => {
         <AddFriend />
       </TabsContent>
       <TabsContent value="recived">
-        <AcceptRequest propsRequests={requestsWithDetails} />
+        <AcceptRequest
+          requests={requests}
+          setRequests={setRequests}
+          isLoading={isLoading}
+        />
       </TabsContent>
     </Tabs>
   );

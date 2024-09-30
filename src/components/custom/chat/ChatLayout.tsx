@@ -52,7 +52,7 @@ const ChatLayout: FC<pageProps> = ({
         }}
         onExpand={() => setIsCollapsed(false)}
       >
-        <SideBar isCollapsed={isCollapsed} friends={friends} />
+        <SideBar isCollapsed={isCollapsed} friends={friends} me={me} />
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={position[1]}>{children}</ResizablePanel>

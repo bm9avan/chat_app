@@ -16,20 +16,85 @@ import { UseSound as UseSoundHook } from "@/store/useSound";
 import useSound from "use-sound";
 import { User } from "next-auth";
 import { Divide } from "lucide-react";
+import { pusherClient, pusherNameHelper } from "@/lib/pusher";
+import chatUniqueId from "@/lib/chatUniqueId";
+import toast from "react-hot-toast";
+import Link from "next/link";
 
 interface SideBarProps {
   isCollapsed: boolean;
-  // me: User;
+  me: User;
   friends: User[];
 }
 
-const SideBar: FC<SideBarProps> = ({ isCollapsed, friends }) => {
+const SideBar: FC<SideBarProps> = ({ isCollapsed, friends, me }) => {
   const router = useRouter();
-  // const parms = useParams();
+  const parms = useParams();
   const pathname = usePathname();
   const [unSeenMessages, setUnSeenMessages] = useState<Message[]>([]);
   const { sound } = UseSoundHook();
   const [mouseClickSound] = useSound("/sounds/mouse-click.mp3");
+
+  useEffect(() => {
+    console.log(parms);
+    pusherClient.subscribe(pusherNameHelper(`chat:${me.id}:friend`));
+    function realTimeHandler1(message: {
+      senderId: string;
+      message: string;
+      timestamp: number;
+      chatId: string;
+      senderImg: string;
+      senderName: string;
+    }) {
+      console.log(message);
+      if (parms?.friend_id !== message.senderId) {
+        toast(
+          <Link href={`/chat/${message.senderId}`} className="flex">
+            <Avatar className="flex justify-center items-center">
+              <AvatarImage
+                referrerPolicy="no-referrer"
+                src={message?.senderImg || "/user-placeholder.png"}
+                alt="User Image"
+                className="border-2 border-white rounded-full"
+              />
+              <AvatarFallback>
+                {message.senderName
+                  ? message.senderName.slice(0, 2).toUpperCase()
+                  : "-_-"}
+              </AvatarFallback>
+            </Avatar>
+            <b>{message.senderName}</b>
+            <p>{message.message}</p>
+          </Link>
+        );
+        if (message.chatId) {
+          setUnSeenMessages((prev) => [...prev, message]);
+        }
+      }
+      console.log("real time message");
+    }
+    pusherClient.bind("new_message", realTimeHandler1);
+    pusherClient.subscribe(pusherNameHelper(`user:${me.id}:friend`));
+    function realTimeHandler2({ friend }: { friend: User }) {
+      console.log("friend added");
+      toast(
+        <p>
+          <b>{friend.name}</b> Accepted your request
+        </p>
+      );
+      router.refresh();
+    }
+    pusherClient.bind("friendship_established", realTimeHandler2);
+    return () => {
+      console.log("sorry we its time to unbind");
+      pusherClient.unbind("new_message", realTimeHandler1);
+      pusherClient.unsubscribe(pusherNameHelper(`chat:${me.id}}:friend`));
+      console.log("sorry we its time to unbind");
+      pusherClient.unbind("friendship_established", realTimeHandler2);
+      pusherClient.unsubscribe(pusherNameHelper(`user:${me.id}:friend`));
+    };
+  }, []);
+
   useEffect(() => {
     if (pathname.includes("/chat")) {
       setUnSeenMessages((prev) =>
@@ -50,9 +115,9 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed, friends }) => {
         {friends.length > 0 ? (
           friends.sort().map((user) => {
             const unseenCount = unSeenMessages.filter(
-              (mes) => mes.senderId !== user.id
+              (mes) => mes.senderId === user.id
             );
-            console.log("is map correct", user, user.id);
+            // console.log("is map correct", user, user.id);
             return (
               <div className="flex flex-row" key={user.id}>
                 <Button
