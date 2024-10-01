@@ -130,8 +130,16 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed, friends, me }) => {
             );
           })
         ) : (
-          <div className="flex flex-row">
-            <div className="md:m-2">No Friends</div>
+          <div className="flex flex-row justify-center">
+            <div
+              className={`${
+                isCollapsed
+                  ? "[writing-mode:vertical-rl] [text-orientation:upright]"
+                  : "sm:[writing-mode:vertical-rl] sm:[text-orientation:upright]"
+              } md:m-2 `}
+            >
+              No Friends
+            </div>
           </div>
         )}
       </ScrollArea>
