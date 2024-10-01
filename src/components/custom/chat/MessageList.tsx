@@ -1,18 +1,11 @@
 "use client";
-import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { useSelectedUser } from "@/store/useSelectedUser";
-// import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
-// import { useQuery } from "@tanstack/react-query";
-// import { getMessages } from "@/actions/message.actions";
-import { useEffect, useRef, useState } from "react";
-import { messages, USERS } from "@/db/dummyData";
-import { User } from "next-auth";
-import { fetchHelperForRedis } from "@/lib/redis";
-import { pusherClient, pusherNameHelper } from "@/lib/pusher";
 import chatUniqueId from "@/lib/chatUniqueId";
-// import MessageSkeleton from "../skeletons/MessageSkeleton";
+import { pusherClient, pusherNameHelper } from "@/lib/pusher";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { User } from "next-auth";
+import { useEffect, useRef, useState } from "react";
 
 const MessageList = ({
   messages: dbMessages,
@@ -31,15 +24,12 @@ const MessageList = ({
       pusherNameHelper(`chat:${chatUniqueId(me.id, friend.id)}`)
     );
     function realTimeHandler(message: Message) {
-      console.log("real time message", message, chatUniqueId(me.id, friend.id));
       setMessages((pr) => {
-        // if (pr === undefined || pr == null) return [newRequest];
         return [message, ...pr];
       });
     }
     pusherClient.bind("incoming_friend_message", realTimeHandler);
     return () => {
-      console.log("sorry we its time to unbind");
       pusherClient.unbind("incoming_friend_message", realTimeHandler);
       pusherClient.unsubscribe(
         pusherNameHelper(`chat:${chatUniqueId(me.id, friend.id)}`)
@@ -52,10 +42,8 @@ const MessageList = ({
       ref={messageContainerRef}
       className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col-reverse"
     >
-      {/* This component ensure that an animation is applied when items are added to or removed from the list */}
-      {/* <AnimatePresence> */}
       {messages &&
-        messages?.map((message, i) => {
+        messages?.map((message) => {
           return (
             <motion.div
               key={message.timestamp}
@@ -80,7 +68,7 @@ const MessageList = ({
                 message.senderId === me.id ? "items-end" : "items-start"
               )}
             >
-              <div className="flex gap-3 items-center">
+              <div className="flex gap-3 items-end">
                 {message.senderId === friend?.id && (
                   <Avatar className="flex justify-center items-center">
                     <AvatarImage
@@ -132,14 +120,6 @@ const MessageList = ({
           You haven't chatted yet. Say hi and start talking!
         </p>
       )}
-      {/* {isMessagesLoading && (
-          <>
-            <MessageSkeleton />
-            <MessageSkeleton />
-            <MessageSkeleton />
-          </>
-        )} */}
-      {/* </AnimatePresence> */}
     </div>
   );
 };

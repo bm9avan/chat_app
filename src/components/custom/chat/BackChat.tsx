@@ -1,8 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { CircleX } from "lucide-react";
-import { redirect, useRouter } from "next/navigation";
-import React from "react";
+import { useRouter } from "next/navigation";
 
 const BackChat = () => {
   const router = useRouter();
@@ -10,7 +9,7 @@ const BackChat = () => {
     <Button
       variant="ghost"
       size="icon"
-      className="right-20"
+      className="right-20 bg-white dark:bg-black"
       onClick={() => router.push("/chat")}
     >
       <CircleX />

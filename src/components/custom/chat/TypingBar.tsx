@@ -1,21 +1,5 @@
 "use client";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  Image as ImageIcon,
-  Loader,
-  Loader2,
-  SendHorizontal,
-  ThumbsUp,
-} from "lucide-react";
-import Image from "next/image";
-import { Textarea } from "@/components/ui/textarea";
-import { useEffect, useRef, useState } from "react";
-import useSound from "use-sound";
-// import { usePreferences } from "@/store/usePreferences";
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
-// import { sendMessageAction } from "@/actions/message.actions";
-// import { useSelectedUser } from "@/store/useSelectedUser";
-// import { CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -23,27 +7,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-// import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
-// import { pusherClient } from "@/lib/pusher";
-import { Message, USERS } from "@/db/dummyData";
-import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { UseSound as UseSoundHook } from "@/store/useSound";
-import EmojiPicker from "./EmojiPicker";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Image as ImageIcon,
+  Loader2,
+  SendHorizontal,
+  ThumbsUp,
+} from "lucide-react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import useSound from "use-sound";
+import EmojiPicker from "./EmojiPicker";
 
 const TypingBar = () => {
   const { friend_id } = useParams();
-  console.log("typeinggg", friend_id);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  // const { USERS[1] } = useSelectedUser();
-  // const { user: USERS[0] } = useKindeBrowserClient();
-
   const { sound } = UseSoundHook();
-  // const queryClient = useQueryClient();
-
   const [imgUrl, setImgUrl] = useState("");
 
   const [playSound1] = useSound("/sounds/keystroke1.mp3");
@@ -59,10 +44,6 @@ const TypingBar = () => {
     const randomIndex = Math.floor(Math.random() * playSoundFunctions.length);
     sound && playSoundFunctions[randomIndex]();
   };
-
-  // const { mutate: sendMessage, isPending } = useMutation({
-  // mutationFn: sendMessageAction,
-  // });
 
   useEffect(() => {
     setIsLoading(false);
@@ -83,8 +64,6 @@ const TypingBar = () => {
         },
         body: JSON.stringify({ message, friendId: friend_id }),
       });
-      // sendMessage({ content: message, messageType: "text", receiverId: USERS[1]?.id! });
-      console.log("bro ", res);
       const data = await res.json();
 
       if (!res.ok) {
@@ -96,7 +75,6 @@ const TypingBar = () => {
         // );
       }
     } catch (error) {
-      console.log(error);
       toast.error("An error occurred while accepting the request.");
     } finally {
       setIsLoading(false);
@@ -117,29 +95,6 @@ const TypingBar = () => {
       setMessage(message + "\n");
     }
   };
-
-  // useEffect(() => {
-  // 	const channelName = `${USERS[0]?.id}__${USERS[1]?.id}`.split("__").sort().join("__");
-  // 	const channel = pusherClient?.subscribe(channelName);
-
-  // 	const handleNewMessage = (data: { message: Message }) => {
-  // 		queryClient.setQueryData(["messages", USERS[1]?.id], (oldMessages: Message[]) => {
-  // 			return [...oldMessages, data.message];
-  // 		});
-
-  // 		if (sound && data.message.senderId !== USERS[0]?.id) {
-  // 			playNotificationSound();
-  // 		}
-  // 	};
-
-  // 	channel.bind("newMessage", handleNewMessage);
-
-  // 	// ! Absolutely important, otherwise the event listener will be added multiple times which means you'll see the incoming new message multiple times
-  // 	return () => {
-  // 		channel.unbind("newMessage", handleNewMessage);
-  // 		pusherClient.unsubscribe(channelName);
-  // 	};
-  // }, [USERS[0]?.id, USERS[1]?.id, queryClient, playNotificationSound, sound]);
 
   return (
     <div className="p-2 flex justify-between w-full items-center gap-2">

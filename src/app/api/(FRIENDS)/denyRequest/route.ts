@@ -5,7 +5,6 @@ import { getServerSession } from "next-auth";
 
 async function DenyFriend(req: Request) {
   const { friendEmail, friendId } = await req.json();
-  console.log("step1", friendEmail);
 
   if (!friendEmail || !friendId) {
     return Response.json("Invalid request: friend details is required", {
@@ -14,7 +13,6 @@ async function DenyFriend(req: Request) {
   }
 
   const currentUser = await getServerSession(authOptions);
-  console.log("step3", currentUser);
 
   if (!currentUser || typeof currentUser.user.email !== "string") {
     return Response.json("Unauthorized request", { status: 401 });
@@ -25,7 +23,6 @@ async function DenyFriend(req: Request) {
     (await fetchHelperForRedis("get", `user:email:${currentUser.user.email}`));
 
   await db.srem(`user:${currentUserId}:incoming_friend_requests`, friendId);
-  console.log("YOu rejected friend now");
 
   return Response.json("Friendship Rejected", { status: 201 });
 }

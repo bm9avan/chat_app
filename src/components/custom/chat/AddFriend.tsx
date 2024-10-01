@@ -1,13 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { User } from "next-auth";
 import { type FormEvent, useState } from "react";
 import toast from "react-hot-toast";
+
 const AddFriend = () => {
-  // const [addFriends, setAddFriends] = useState(false);
   const [response, setResponse] = useState<{
     success: boolean;
     message: string;
@@ -40,9 +38,6 @@ const AddFriend = () => {
   }
   return (
     <form onSubmit={addFriendHandler} className="grid gap-2">
-      {/* <Label htmlFor="email" className="text-black dark:text-white text-xl">
-        Send Friend Request
-      </Label> */}
       <Input
         id="email"
         type="email"

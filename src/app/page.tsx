@@ -13,8 +13,6 @@ export default function LandingPage() {
   return (
     <>
       <main className="flex-1">
-        {" "}
-        {/* Added top padding to account for fixed header */}
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
           <div className="container px-4 m-auto md:px-6">
             <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8">
@@ -39,7 +37,7 @@ export default function LandingPage() {
                 >
                   {true ? (
                     <Button onClick={() => router.push("/chat")}>
-                      Get Started-//move to chat
+                      Get Started
                     </Button>
                   ) : (
                     <Dialog trigger={"Get Started"}>

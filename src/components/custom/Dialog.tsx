@@ -1,11 +1,10 @@
-import React, { type ReactNode, type PropsWithChildren } from "react";
 import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "../ui/button";
+import { type PropsWithChildren, type ReactNode } from "react";
 
 type Props = PropsWithChildren<{ trigger: ReactNode }>;
 

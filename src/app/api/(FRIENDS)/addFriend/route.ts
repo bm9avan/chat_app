@@ -7,7 +7,6 @@ import { getServerSession } from "next-auth";
 async function AddFriend(req: Request) {
   try {
     const { friendEmail } = await req.json();
-    console.log("step1", friendEmail);
 
     if (!friendEmail) {
       return Response.json("Invalid request: friend email is required", {
@@ -19,7 +18,6 @@ async function AddFriend(req: Request) {
       "get",
       `user:email:${friendEmail}`
     );
-    console.log("step2", friendId);
 
     if (!friendId) {
       return Response.json("User not found with corresponding email", {
@@ -28,7 +26,6 @@ async function AddFriend(req: Request) {
     }
 
     const currentUser = await getServerSession(authOptions);
-    console.log("step3", currentUser);
 
     if (!currentUser || typeof currentUser.user.email !== "string") {
       return Response.json("Unauthorized request", { status: 401 });
@@ -45,7 +42,6 @@ async function AddFriend(req: Request) {
         "get",
         `user:email:${currentUser.user.email}`
       ));
-    // console.log("my id wait is", currentUserId, 0 || 1, 2 || 0, 1 || 3);
     const isRequestAlreadySent = (await fetchHelperForRedis(
       "sismember",
       `user:${friendId}:incoming_friend_requests`,
@@ -79,7 +75,6 @@ async function AddFriend(req: Request) {
     }
 
     await db.sadd(`user:${friendId}:incoming_friend_requests`, currentUserId);
-    console.log("Friend request sent successfully");
     pusherServer.trigger(
       pusherNameHelper(`user:${friendId}:incoming_friend_requests`),
       "incoming_friend_requests",

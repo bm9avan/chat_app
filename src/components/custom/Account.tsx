@@ -33,10 +33,6 @@ export function Account() {
       setIsLoading(true);
       await signIn("google");
     } catch (error) {
-      // if (error && typeof (error.message) === "string") {
-      //   setError(error.message);
-      // }else
-      // setError("Login with Google failed");
       toast.error("Login with Google failed");
     } finally {
       setIsLoading(false);
@@ -48,10 +44,6 @@ export function Account() {
       setIsLoading(true);
       await signIn("github");
     } catch (error) {
-      // if (error && typeof (error.message) === "string") {
-      //   setError(error.message);
-      // }else
-      // setError("Login with Google failed");
       toast.error("Login with Github failed");
     } finally {
       setIsLoading(false);

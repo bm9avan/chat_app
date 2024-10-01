@@ -25,7 +25,6 @@ export default async function RootLayout({
     })
   );
 
-  // console.log("layout ", friendsWithDetails);
   params.friends = friends;
   if (!session) {
     redirect("/api/auth/signin?callbackUrl=/chat");

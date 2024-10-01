@@ -1,13 +1,13 @@
-import { FC } from "react";
-import Picker from "@emoji-mart/react";
-import emojiData from "@emoji-mart/data";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import emojiData from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
 import { SmileIcon } from "lucide-react";
 import { useTheme } from "next-themes";
+import { FC } from "react";
 
 interface EmojiPickerProps {
   onChange: (emoji: string) => void;

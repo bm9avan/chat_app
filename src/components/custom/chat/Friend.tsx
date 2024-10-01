@@ -16,7 +16,6 @@ const Friend = ({ me }: { me: User }) => {
         "smembers",
         `user:${me?.id}:incoming_friend_requests`
       );
-      console.log("req", requests, requests.length);
       const requestsWithDetails = await Promise.all(
         requests.map(async (id: string) => {
           const requestDetails = await fetchHelperForRedis("get", `user:${id}`);
@@ -33,13 +32,11 @@ const Friend = ({ me }: { me: User }) => {
     function realTimeHandler({ newRequest }: { newRequest: User }) {
       setRequests((pr) => {
         // if (pr === undefined || pr == null) return [newRequest];
-        console.log(newRequest);
         return [...pr, newRequest];
       });
     }
     pusherClient.bind("incoming_friend_requests", realTimeHandler);
     return () => {
-      console.log("sorry we its time to unbind");
       pusherClient.unbind("incoming_friend_requests", realTimeHandler);
       pusherClient.unsubscribe(
         pusherNameHelper(`user:${me?.id}:incoming_friend_requests`)

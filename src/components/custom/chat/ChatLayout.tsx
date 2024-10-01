@@ -4,9 +4,9 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { User } from "next-auth";
 import { FC, ReactNode, useEffect, useState } from "react";
 import SideBar from "./SideBar";
-import { User } from "next-auth";
 
 interface pageProps {
   position: number[] | undefined;
