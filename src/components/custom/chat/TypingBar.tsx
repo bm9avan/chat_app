@@ -1,12 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogFooter,
+//   DialogHeader,
+//   DialogTitle,
+// } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { UseSound as UseSoundHook } from "@/store/useSound";
 import { AnimatePresence, motion } from "framer-motion";
@@ -16,7 +16,7 @@ import {
   SendHorizontal,
   ThumbsUp,
 } from "lucide-react";
-import Image from "next/image";
+// import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";

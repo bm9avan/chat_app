@@ -5,7 +5,6 @@ import "./globals.css";
 import TostProvider from "@/components/providers/TostProvider";
 import AuthProvider from "@/components/providers/SessionProvider";
 import { getServerSession } from "next-auth";
-import { fetchHelperForRedis } from "@/lib/redis";
 import { authOptions } from "@/lib/auth";
 
 const inter = Inter({ subsets: ["latin"] });
