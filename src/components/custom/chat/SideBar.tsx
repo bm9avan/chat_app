@@ -79,7 +79,9 @@ const SideBar: FC<SideBarProps> = ({ isCollapsed, friends, me }) => {
                 <Button
                   onClick={() => {
                     // setSelcted(user.id);
-                    sound && mouseClickSound();
+                    if (sound) {
+                      mouseClickSound();
+                    }
                     // router.push(`/chat/${user.id}`);
                     router.push(`/chat/${user.id}`);
                   }}

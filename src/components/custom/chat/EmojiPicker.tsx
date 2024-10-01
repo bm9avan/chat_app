@@ -27,7 +27,9 @@ const EmojiPicker: FC<EmojiPickerProps> = ({ onChange }) => {
             emojiSize={18}
             maxFrequentRows={1}
             theme={theme}
-            onEmojiSelect={(emoji: any) => onChange(emoji.native)}
+            onEmojiSelect={(emoji: { native: string }) =>
+              onChange(emoji.native)
+            }
           />
         </PopoverContent>
       </Popover>

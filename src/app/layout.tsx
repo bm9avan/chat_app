@@ -22,10 +22,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const currentUser = await getServerSession(authOptions);
-  const currentUserId = await fetchHelperForRedis(
-    "get",
-    `user:email:${currentUser?.user.email}`
-  );
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>

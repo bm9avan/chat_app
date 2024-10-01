@@ -147,7 +147,9 @@ export default function NavBar({
             size="icon"
             onClick={() => {
               setTheme(theme === "dark" ? "light" : "dark");
-              sound && mouseClickSound();
+              if (sound) {
+                mouseClickSound();
+              }
             }}
           >
             {theme === "dark" ? (

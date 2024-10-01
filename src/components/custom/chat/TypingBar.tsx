@@ -29,20 +29,22 @@ const TypingBar = () => {
   const [isLoading, setIsLoading] = useState(true);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const { sound } = UseSoundHook();
-  const [imgUrl, setImgUrl] = useState("");
+  // const [imgUrl, setImgUrl] = useState("");
 
   const [playSound1] = useSound("/sounds/keystroke1.mp3");
   const [playSound2] = useSound("/sounds/keystroke2.mp3");
   const [playSound3] = useSound("/sounds/keystroke3.mp3");
   const [playSound4] = useSound("/sounds/keystroke4.mp3");
 
-  const [playNotificationSound] = useSound("/sounds/notification.mp3");
+  // const [playNotificationSound] = useSound("/sounds/notification.mp3");
 
   const playSoundFunctions = [playSound1, playSound2, playSound3, playSound4];
 
   const playRandomKeyStrokeSound = () => {
     const randomIndex = Math.floor(Math.random() * playSoundFunctions.length);
-    sound && playSoundFunctions[randomIndex]();
+    if (sound) {
+      playSoundFunctions[randomIndex]();
+    }
   };
 
   useEffect(() => {
@@ -75,6 +77,7 @@ const TypingBar = () => {
         // );
       }
     } catch (error) {
+      console.log(error);
       toast.error("An error occurred while accepting the request.");
     } finally {
       setIsLoading(false);
@@ -118,7 +121,7 @@ const TypingBar = () => {
         // </CldUploadWidget>
       )}
 
-      <Dialog open={!!imgUrl}>
+      {/* <Dialog open={!!imgUrl}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Image Preview</DialogTitle>
@@ -148,7 +151,7 @@ const TypingBar = () => {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
       <AnimatePresence>
         <motion.div

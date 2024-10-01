@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 
 interface AcceptRequestProps {
   requests: User[];
-  setRequests: Function;
+  setRequests: React.Dispatch<React.SetStateAction<User[]>>;
   isLoading: boolean;
 }
 
@@ -51,6 +51,7 @@ const AcceptRequest = ({
       }
       route.refresh();
     } catch (error) {
+      console.log(error);
       toast.error("An error occurred while accepting the request.");
     } finally {
       setLoading(null);
@@ -86,6 +87,7 @@ const AcceptRequest = ({
         );
       }
     } catch (error) {
+      console.log(error);
       toast.error("An error occurred while accepting the request.");
     } finally {
       setLoading(null);
@@ -107,6 +109,7 @@ const AcceptRequest = ({
             </div>
             <Button
               onClick={() => handleAccept(user.email, user.id)}
+              disabled={loading === user.id}
               aria-label="accept friend"
               className="w-8 h-8 bg-green-600 hover:bg-green-700 grid place-items-center rounded-full transition hover:shadow-md"
             >
@@ -114,6 +117,7 @@ const AcceptRequest = ({
             </Button>
             <Button
               onClick={() => handleDeny(user.email, user.id)}
+              disabled={loading === user.id}
               aria-label="deny friend"
               className="w-8 h-8 bg-red-600 hover:bg-red-700 text-center grid place-items-center rounded-full transition hover:shadow-md"
             >

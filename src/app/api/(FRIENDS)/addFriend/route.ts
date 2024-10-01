@@ -84,6 +84,7 @@ async function AddFriend(req: Request) {
     );
     return Response.json("Friend request sent successfully", { status: 201 });
   } catch (error) {
+    console.log(error);
     return Response.json("Error: Invalid Request", { status: 500 });
   }
 }

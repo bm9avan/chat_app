@@ -38,7 +38,7 @@ async function SendMessage(req: Request) {
     if (!isAlreadyFriend) {
       return Response.json("User is not your friend", { status: 203 });
     }
-    const friendDetails = (await db.get(`user:${friendId}`)) as User;
+    // const friendDetails = (await db.get(`user:${friendId}`)) as User;
     const timestamp = Date.now();
     await db.zadd(`chat:${chatUniqueId(currentUserId, friendId)}`, {
       score: timestamp,
@@ -68,6 +68,7 @@ async function SendMessage(req: Request) {
       status: 200,
     });
   } catch (error) {
+    console.log(error);
     return Response.json("Error: Invalid Request", { status: 500 });
   }
 }

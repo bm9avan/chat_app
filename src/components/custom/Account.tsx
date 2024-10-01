@@ -33,6 +33,7 @@ export function Account() {
       setIsLoading(true);
       await signIn("google");
     } catch (error) {
+      console.error(error);
       toast.error("Login with Google failed");
     } finally {
       setIsLoading(false);
@@ -44,6 +45,7 @@ export function Account() {
       setIsLoading(true);
       await signIn("github");
     } catch (error) {
+      console.error(error);
       toast.error("Login with Github failed");
     } finally {
       setIsLoading(false);

@@ -117,7 +117,7 @@ const MessageList = ({
         })}
       {messages.length === 0 && (
         <p className="text-muted-foreground text-center">
-          You haven't chatted yet. Say hi and start talking!
+          You haven&apos;t chatted yet. Say hi and start talking!
         </p>
       )}
     </div>
