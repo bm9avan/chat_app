@@ -36,8 +36,6 @@ const TypingBar = () => {
   const [playSound3] = useSound("/sounds/keystroke3.mp3");
   const [playSound4] = useSound("/sounds/keystroke4.mp3");
 
-  // const [playNotificationSound] = useSound("/sounds/notification.mp3");
-
   const playSoundFunctions = [playSound1, playSound2, playSound3, playSound4];
 
   const playRandomKeyStrokeSound = () => {
@@ -51,20 +49,24 @@ const TypingBar = () => {
     setIsLoading(false);
   }, []);
 
-  const handleSendMessage = async () => {
-    if (!message.trim()) return;
+  const handleSendMessage = async (thumbsUp = false) => {
+    if (!message.trim() && !thumbsUp) return;
     if (typeof friend_id !== "string" || !friend_id) {
       toast.error("Friend ID is required");
       return;
     }
     setIsLoading(true);
+    console.log("sending 👍", thumbsUp);
     try {
       const res = await fetch("/api/sendMessage", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message, friendId: friend_id }),
+        body: JSON.stringify({
+          message: thumbsUp ? "👍" : message,
+          friendId: friend_id,
+        }),
       });
       const data = await res.json();
 
@@ -200,7 +202,7 @@ const TypingBar = () => {
             className="h-9 w-9 dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white shrink-0"
             variant={"ghost"}
             size={"icon"}
-            onClick={handleSendMessage}
+            onClick={() => handleSendMessage()}
             disabled={isLoading}
           >
             {isLoading ? (
@@ -214,17 +216,15 @@ const TypingBar = () => {
             className="h-9 w-9 dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white shrink-0"
             variant={"ghost"}
             size={"icon"}
+            onClick={() => {
+              handleSendMessage(true);
+            }}
           >
-            {/* {!isPending && ( */}
-            <ThumbsUp
-              size={20}
-              className="text-muted-foreground"
-              onClick={() => {
-                // sendMessage({ content: "👍", messageType: "text", receiverId: USERS[1]?.id! });
-              }}
-            />
-            {/* )} */}
-            {/* {isPending && <Loader size={20} className='animate-spin' />} */}
+            {isLoading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <ThumbsUp size={20} className="text-muted-foreground" />
+            )}
           </Button>
         )}
       </AnimatePresence>
